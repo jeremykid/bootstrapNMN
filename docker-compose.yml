@@ -1,0 +1,37 @@
+version: '2'
+services:
+
+  web:
+    image: node:argon
+    volumes:
+      - ./backend:/usr/src/app
+    working_dir: /usr/src/app
+    command: sh -c 'node app.js'
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    networks:
+      - all
+    environment:
+      MONGODB_URI: "mongodb://mongo:27017/accounts"
+      
+  mongo:
+    image: mongo
+    command: mongod --smallfiles
+    networks:
+      - all
+
+  nginx:
+    build: ./nginx/
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/www/public
+    depends_on:
+      - web
+    networks:
+      - all
+
+networks:
+  all:
